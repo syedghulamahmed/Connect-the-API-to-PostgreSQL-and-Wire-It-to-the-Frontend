@@ -1,0 +1,10 @@
+import { Router } from "express";
+import { getApplications, getInternshipById, getInternships, postApplication } from "../controllers/internshipController.js";
+import { getApplicationStatus, getTopCompanies } from "../controllers/reportController.js";
+export const apiRouter = Router();
+apiRouter.get("/internships", getInternships);
+apiRouter.get("/internships/:id", getInternshipById);
+apiRouter.post("/internships/:id/applications", postApplication);
+apiRouter.get("/applications", getApplications);
+apiRouter.get("/reports/top-companies", getTopCompanies);
+apiRouter.get("/reports/application-status", getApplicationStatus);
