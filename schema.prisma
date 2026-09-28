@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ApplicationStatus {
+  PENDING
+  REVIEWING
+  ACCEPTED
+  REJECTED
+}
+
+model Company {
+  id          String       @id @default(uuid())
+  name        String       @unique @db.VarChar(120)
+  slug        String       @unique @db.VarChar(140)
+  description String       @db.Text
+  website     String?      @db.VarChar(255)
+  location    String       @db.VarChar(120)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  internships Internship[]
+}
+
+model Internship {
+  id               String                    @id @default(uuid())
+  companyId        String
+  title            String                    @db.VarChar(160)
+  location         String                    @db.VarChar(120)
+  category         String                    @db.VarChar(80)
+  type             String                    @db.VarChar(50)
+  duration         String                    @db.VarChar(50)
+  stipend          String                    @db.VarChar(80)
+  description      String                    @db.Text
+  responsibilities String[]
+  requirements     String[]
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+  company          Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  applications     Application[]
+  requiredSkills   InternshipRequiredSkill[]
+
+  @@index([location])
+  @@index([companyId])
+  @@index([category])
+}
+
+model Student {
+  id           String         @id @default(uuid())
+  name         String         @db.VarChar(120)
+  email        String         @unique @db.VarChar(180)
+  university   String         @db.VarChar(160)
+  graduationYear Int
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  applications Application[]
+  skills       StudentSkill[]
+}
+
+model Application {
+  id           String            @id @default(uuid())
+  studentId    String
+  internshipId String
+  coverNote    String            @db.Text
+  status       ApplicationStatus @default(PENDING)
+  appliedAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  student      Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  internship   Internship        @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, internshipId])
+  @@index([status])
+  @@index([internshipId])
+  @@index([studentId])
+}
+
+model Skill {
+  id              String                    @id @default(uuid())
+  name            String                    @unique @db.VarChar(80)
+  students        StudentSkill[]
+  internships     InternshipRequiredSkill[]
+}
+
+model StudentSkill {
+  studentId String
+  skillId   String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  skill     Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([studentId, skillId])
+  @@index([skillId])
+}
+
+model InternshipRequiredSkill {
+  internshipId String
+  skillId      String
+  internship   Internship @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+  skill        Skill      @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([internshipId, skillId])
+  @@index([skillId])
+}
