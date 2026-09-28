@@ -1,13 +1,21 @@
-# TalentBridge Frontend — Week 2
+# TalentBridge — Task 4: PostgreSQL + Prisma
 
-React + TypeScript frontend based on the Week 1/Task 2 internship dashboard. The mock JSON data source has been removed from runtime use.
+Full-stack TalentBridge internship platform using React + TypeScript on the frontend and Express + Prisma + PostgreSQL on the backend.
 
-## Environment
+## Structure
 
-Copy `.env.example` to `.env`:
+- `frontend/` — Vite React application
+- `backend/src/` — Express server, routes, controllers, services, middleware and Prisma client
+- `backend/prisma/` — Prisma schema, seed and migration history
+- `docs/` — API and SQL notes
+- `docker-compose.yml` — local PostgreSQL
 
-```env
-VITE_API_BASE_URL=http://localhost:4000/api
-```
+## Run
 
-The frontend now uses real HTTP requests for internship lists, individual internship details, and application submission. Loading and error states therefore reflect actual network/API conditions rather than simulated delays or random failures.
+1. Start PostgreSQL: `docker compose up -d`
+2. Copy `backend/.env.example` to `backend/.env`
+3. In `backend`: `npm install && npm run prisma:generate && npm run prisma:deploy && npm run prisma:seed && npm run dev`
+4. Copy `frontend/.env.example` to `frontend/.env`
+5. In `frontend`: `npm install && npm run dev`
+
+The API defaults to `http://localhost:4000`; the frontend uses `VITE_API_BASE_URL=http://localhost:4000/api`.
